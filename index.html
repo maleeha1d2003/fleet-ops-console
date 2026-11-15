@@ -1,0 +1,49 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Meridian Logistics Fleet Operations Console">
+  <title>Fleet Ops Console | Meridian Logistics</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="header">
+    <div>
+      <p class="eyebrow">MERIDIAN LOGISTICS</p>
+      <h1>Fleet Operations Console</h1>
+      <p class="subtitle">Vehicle overview and fleet status</p>
+    </div>
+    <span class="live-indicator">● Static data</span>
+  </header>
+
+  <main class="dashboard">
+    <section class="fleet-panel" aria-labelledby="fleet-heading">
+      <div class="panel-heading">
+        <div>
+          <h2 id="fleet-heading">Vehicle Fleet</h2>
+          <p>Current vehicle records</p>
+        </div>
+        <span id="vehicle-count" aria-live="polite">Loading...</span>
+      </div>
+
+      <p id="keyboard-help" class="keyboard-help">
+        Use the Up and Down arrow keys to navigate vehicles.
+        Home moves to the first vehicle and End to the last.
+      </p>
+<ul
+  id="vehicle-list"
+  class="vehicle-list"
+  aria-label="Fleet vehicles"
+  aria-describedby="keyboard-help"
+></ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>Meridian Logistics · Fleet Operations</p>
+  </footer>
+</body>
+</html>
