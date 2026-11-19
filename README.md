@@ -1,39 +1,32 @@
 # Fleet Ops Console – Meridian Logistics
 
-A responsive fleet operations dashboard built with HTML, CSS, and vanilla JavaScript. This project generates and displays 400 sample vehicle records for Meridian Logistics.
+A responsive fleet operations dashboard built with HTML, CSS, and vanilla JavaScript. The project generates 400 sample vehicle records and uses list virtualisation to reduce the number of rendered DOM elements while preserving the complete scroll range.
 
-## Project Overview
+## Task 2 – Virtualised List for 400 Rows
 
-The objective is to create the foundation for a fleet management interface that displays vehicle IDs, types, current statuses, and locations.
+### What Changed
 
-## Features
+- Replaced the full 400-row DOM rendering approach with a virtualised rendering window.
+- Renders visible vehicles along with an eight-row buffer above and below the viewport.
+- Uses top and bottom spacer elements so the scrollbar represents the height of all 400 vehicles.
+- Measures rendered row heights and updates cumulative offsets to support rows that become taller when the layout wraps.
+- Uses `requestAnimationFrame` to batch scroll-driven rendering updates.
+- Preserves the first visible vehicle and its within-row offset when the browser window is resized.
+- Retains keyboard navigation with Up Arrow, Down Arrow, Home, and End.
+- Uses no external UI libraries or virtualisation packages.
 
-- Generates 400 unique vehicle records.
-- Displays vehicle IDs, types, statuses, and locations.
-- Scrollable vehicle list.
-- Keyboard navigation using Up Arrow, Down Arrow, Home, and End.
-- Visible keyboard focus indicators.
-- Accessible HTML list structure and ARIA descriptions.
-- Responsive layout for desktop and mobile screens.
-- Status indicators with distinct colours.
-- No external UI libraries or frameworks.
+### How Virtualisation Works
 
-## Technology Stack
+The application calculates the first and last visible vehicle using the list's scroll position and viewport height. It then renders that range with an eight-row buffer.
 
-- HTML5
-- CSS3
-- JavaScript
-- Node.js
-- JSON
-- Visual Studio Code
-- Google Chrome DevTools
-- Git and GitHub
+Two spacer elements represent the height of all rows before and after the rendered window. This allows the complete dataset to remain available while only a small portion of the vehicle cards exists in the DOM.
+
+Measured row heights are stored and converted into cumulative offsets. Binary search locates the row at a given scroll offset, while `requestAnimationFrame` avoids performing repeated DOM updates for every raw scroll event.
 
 ## Project Structure
 
 ```text
 fleet-ops-console/
-│
 ├── index.html
 ├── style.css
 ├── app.js
@@ -41,6 +34,10 @@ fleet-ops-console/
 │   └── vehicles.json
 ├── scripts/
 │   └── generate-vehicles.js
+├── screenshots/
+│   ├── before-virtualisation.png
+│   ├── after-virtualisation.png
+│   └── after-dom-count.png
 └── README.md
 ```
 
@@ -52,40 +49,19 @@ Install Node.js and npm.
 
 ### 1. Generate Vehicle Data
 
-Open a terminal in the project directory and run:
-
 ```bash
 node scripts/generate-vehicles.js
 ```
 
-The script generates 400 vehicle records and saves them in:
-
-```text
-data/vehicles.json
-```
-
-Each record contains:
-
-- Unique vehicle ID
-- Vehicle type
-- Current status
-- Location
+The script creates 400 vehicle records in `data/vehicles.json`.
 
 ### 2. Run the Website
 
-Open the project folder in Visual Studio Code.
+Open the project folder in Visual Studio Code and start it using the Live Server extension or another local HTTP server.
 
-Start a local static web server. For example, if you have the VS Code Live Server extension installed, right-click `index.html` and select **Open with Live Server**.
+Do not open `index.html` directly using a `file://` URL because the browser may block the JSON fetch.
 
-Alternatively, use a local HTTP server and open its localhost address in your browser.
-
-### 3. View the Vehicle Dashboard
-
-The dashboard displays all 400 vehicle records in a vertically scrollable list.
-
-## Keyboard Navigation
-
-The vehicle list supports the following keyboard controls:
+### 3. Keyboard Navigation
 
 | Key | Action |
 |---|---|
@@ -94,36 +70,69 @@ The vehicle list supports the following keyboard controls:
 | Home | Move to the first vehicle |
 | End | Move to the last vehicle |
 
-The focused vehicle is highlighted with a visible outline.
+## Performance Verification
+
+Chrome DevTools Performance recordings were captured for both the original and virtualised versions using the same browser and scrolling approach.
+
+The following observations were recorded:
+
+| Check | Before Virtualisation | After Virtualisation |
+|---|---|---|
+| Vehicle records in dataset | 400 | 400 |
+| Vehicle card elements in DOM | 400 | 17 |
+| Scroll range | Full vehicle list | Full vehicle list |
+| Scroll position after resizing | Original implementation | Preserved on the same visible vehicle |
+
+The after-virtualisation DOM count was measured in Chrome DevTools Console using:
+
+```javascript
+document.querySelectorAll("#vehicle-list .vehicle-card").length
+```
+
+The measured result was **17 rendered vehicle cards**, rather than all 400 vehicle cards.
+
+### Performance Evidence
+
+#### Before Virtualisation
+
+The following screenshot shows the Chrome DevTools Performance recording of the original implementation, before list virtualisation.
+
+![Before virtualisation performance recording](screenshots/before-virtualisation.png)
+
+#### After Virtualisation
+
+The following screenshot shows the Chrome DevTools Performance recording after implementing list virtualisation.
+
+![After virtualisation performance recording](screenshots/after-virtualisation.png)
+
+#### DOM Count Verification
+
+The following screenshot shows the actual Chrome DevTools Console result confirming that only 17 vehicle cards were rendered in the DOM at the time of measurement.
+
+![After virtualisation DOM count verification](screenshots/after-dom-count.png)
+
+## Task 2 Decision Log
+
+| Decision | Reason |
+|---|---|
+| Vanilla JavaScript windowing | Keeps the project lightweight and avoids adding a dependency. |
+| Eight-row render buffer | Reduces the chance of blank gaps while scrolling quickly. |
+| Spacer elements | Preserve the total scroll height even though most vehicle rows are not mounted. |
+| Measured row heights | Support responsive layouts where text may wrap and row heights can vary. |
+| `requestAnimationFrame` | Aligns DOM updates with browser rendering frames. |
+| Scroll anchor on resize | Keeps the same vehicle and relative position visible after resizing. |
 
 ## Data Validation
 
-The generated dataset was verified using Node.js.
+The original generator creates 400 unique vehicle records. Run it with `node scripts/generate-vehicles.js` if the dataset needs to be regenerated.
 
-| Validation | Result |
-|---|---:|
-| Total records | 400 |
-| Unique vehicle IDs | 400 |
-| First vehicle ID | VH-001 |
-| Last vehicle ID | VH-400 |
-| Missing required fields | 0 |
+## Deployment
 
-## Accessibility
+The project is hosted on GitHub Pages:
 
-Accessibility features include:
+[https://maleeha1d2003.github.io/fleet-ops-console/](https://maleeha1d2003.github.io/fleet-ops-console/)
 
-- Semantic HTML list elements.
-- Accessible labels and descriptions.
-- Keyboard navigation.
-- Visible focus indicators.
-- High-contrast text and status labels.
-- Responsive layout.
-
-Further manual accessibility testing is recommended.
-
-## Project Scope
-
-This implementation provides a static vehicle list using generated sample data. Live updates, persistent filters, virtualization, and vehicle detail panels are intended for subsequent project tasks.
+After committing and pushing changes to the `main` branch, GitHub Pages rebuilds the site from the repository root.
 
 ## Author
 

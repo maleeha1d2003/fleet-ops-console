@@ -196,3 +196,14 @@ footer {
     padding: 16px;
   }
 }
+
+/* Task 2: spacer rows preserve the full virtual scroll height. */
+.virtual-spacer {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  pointer-events: none;
+}
